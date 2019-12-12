@@ -21,9 +21,9 @@ import fr.neatmonster.nocheatplus.hooks.NCPHook;
 
 public class NCPDragDownHook implements NCPHook
 {
-	//private IGenericInstanceHandle<MCAccess> mcAccess = null;
-	private final CheckType type[] = {CheckType.MOVING_SURVIVALFLY, CheckType.MOVING_PASSABLE};
-	public NCPDragDownHook() {
+    //private IGenericInstanceHandle<MCAccess> mcAccess = null;
+    private final CheckType type[] = {CheckType.MOVING_SURVIVALFLY, CheckType.MOVING_PASSABLE};
+    public NCPDragDownHook() {
         hook();
         //mcAccess = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstanceHandle(MCAccess.class);
     }
@@ -43,46 +43,46 @@ public class NCPDragDownHook implements NCPHook
         final Block bDown = p.getLocation().getBlock().getRelative(BlockFace.DOWN);
         final IPlayerData pData = DataManager.getPlayerData(p);
         if (pData != null) {
-        	final MovingData mData = pData.getGenericInstance(MovingData.class);
+            final MovingData mData = pData.getGenericInstance(MovingData.class);
             MaxY = mData.noFallMaxY;
             FallDist = mData.noFallFallDistance;
         }
         if (PlayerUtil.isOnGround(p, 1.0) || PlayerUtil.isOnGround(p, 0.0)) {
-        	if (pData != null) {
-        	    final MovingData mData = pData.getGenericInstance(MovingData.class);
-        	    if (mData.hasSetBack()) if (mData.getSetBackY() >= p.getLocation().getY()) {
+            if (pData != null) {
+                final MovingData mData = pData.getGenericInstance(MovingData.class);
+                if (mData.hasSetBack()) if (mData.getSetBackY() >= p.getLocation().getY()) {
                     mData.noFallMaxY = MaxY;
-            	    mData.noFallFallDistance = FallDist;
-            	    mData.setTeleported(p.getLocation());
-            	    if (debug) {
-            	        log("Set position to current location!", p);
-            	    }
-            	    return false;
-        	    }
-        	}
-        	return false;
+                    mData.noFallFallDistance = FallDist;
+                    mData.setTeleported(p.getLocation());
+                    if (debug) {
+                        log("Set position to current location!", p);
+                    }
+                    return false;
+                }
+            }
+            return false;
         }
         ploc.setX(p.getLocation().getX());
         boolean is2 = false;
         if (PlayerUtil.isAir(bDown.getType())) {
-        	final Block bDown2 = bDown.getRelative(BlockFace.DOWN);
-        	if (PlayerUtil.isAir(bDown2.getType())) {
-        		is2 = true;
-        		ploc.setY((double)bDown2.getLocation().getBlockY());
-        	} else ploc.setY((double)bDown.getLocation().getBlockY());
+            final Block bDown2 = bDown.getRelative(BlockFace.DOWN);
+            if (PlayerUtil.isAir(bDown2.getType())) {
+                is2 = true;
+                ploc.setY((double)bDown2.getLocation().getBlockY());
+            } else ploc.setY((double)bDown.getLocation().getBlockY());
         }
         ploc.setZ(p.getLocation().getZ());
         ploc.setPitch(p.getLocation().getPitch());
         ploc.setYaw(p.getLocation().getYaw());
         if (MaxY != -1.0 && FallDist != -1.0) {
-        	final MovingData mData = pData.getGenericInstance(MovingData.class);
-        	mData.noFallMaxY = MaxY;
-        	mData.setTeleported(ploc);
-        	mData.noFallFallDistance = FallDist + (is2 ? 2.0f : 1.0f);
+            final MovingData mData = pData.getGenericInstance(MovingData.class);
+            mData.noFallMaxY = MaxY;
+            mData.setTeleported(ploc);
+            mData.noFallFallDistance = FallDist + (is2 ? 2.0f : 1.0f);
         }
         if (debug) {
             log("Set position to " + (is2 ? "2": "1") + " block(s) lower!", p);
-	    }
+        }
         return false;
     }
     
@@ -99,13 +99,13 @@ public class NCPDragDownHook implements NCPHook
     }
     
     private void log(String s, Player p) {
-    	final LogManager logManager = NCPAPIProvider.getNoCheatPlusAPI().getLogManager();
-    	final StringBuilder builder = new StringBuilder(300);
-    	builder.append(getHookName());
-    	builder.append(" [" + ChatColor.YELLOW + p.getName());
+        final LogManager logManager = NCPAPIProvider.getNoCheatPlusAPI().getLogManager();
+        final StringBuilder builder = new StringBuilder(300);
+        builder.append(getHookName());
+        builder.append(" [" + ChatColor.YELLOW + p.getName());
         builder.append(ChatColor.WHITE + "] ");
-    	builder.append(s);
-    	final String message = builder.toString();
-    	logManager.info(Streams.NOTIFY_INGAME, message);
+        builder.append(s);
+        final String message = builder.toString();
+        logManager.info(Streams.NOTIFY_INGAME, message);
     }
 }
