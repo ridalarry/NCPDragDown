@@ -1,0 +1,6 @@
+name: NCPDragDown
+author: Xayanix
+version: 1.0.5
+main: pl.xayanix.ncpdragdown.NCPDragDown
+api-version: 1.13
+depend: [NoCheatPlus]
