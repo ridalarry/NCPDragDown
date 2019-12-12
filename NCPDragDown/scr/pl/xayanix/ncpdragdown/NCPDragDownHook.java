@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import fr.neatmonster.nocheatplus.checks.access.IViolationInfo;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 
 import org.bukkit.entity.Player;
 
@@ -33,20 +34,34 @@ public class NCPDragDownHook implements NCPHook
     }
     
     private boolean dragDown(final Player p, final CheckType checkType) {
-        if (p.getLocation().getY() <= 2.0) {
-            return false;
-        }
         double MaxY = -1.0;
         float FallDist = -1.0f;
-        boolean debug = p.hasPermission("ncpdd.debug");
-        final Location ploc = p.getLocation();
-        final Block bDown = p.getLocation().getBlock().getRelative(BlockFace.DOWN);
+        final boolean debug = p.hasPermission("ncpdd.debug");
         final IPlayerData pData = DataManager.getPlayerData(p);
         if (pData != null) {
             final MovingData mData = pData.getGenericInstance(MovingData.class);
             MaxY = mData.noFallMaxY;
             FallDist = mData.noFallFallDistance;
         }
+        
+        if (p.getLocation().getY() <= 0.0) {
+            if (MaxY != -1.0 && FallDist != -1.0) {
+                final MovingData mData = pData.getGenericInstance(MovingData.class);
+                mData.noFallMaxY = MaxY;
+                mData.setTeleported(p.getLocation().clone().subtract(0.0, 2.0, 0.0));
+                mData.noFallFallDistance = FallDist + 2.0f;
+                if (debug) log("Set position to 2 blocks lower!", p);  
+            }
+            // Kill player
+            if (p.getLocation().getY() <= -70.0) {
+                BridgeHealth.setHealth(p, 0.0);
+                BridgeHealth.damage(p, 1.0);
+            }
+            return false;
+        }
+        
+        final Location ploc = p.getLocation();
+        final Block bDown = p.getLocation().getBlock().getRelative(BlockFace.DOWN);
         if (PlayerUtil.isOnGround(p, 1.0) || PlayerUtil.isOnGround(p, 0.0)) {
             if (pData != null) {
                 final MovingData mData = pData.getGenericInstance(MovingData.class);
@@ -62,7 +77,13 @@ public class NCPDragDownHook implements NCPHook
             }
             return false;
         }
+        
         ploc.setX(p.getLocation().getX());
+        ploc.setZ(p.getLocation().getZ());
+        ploc.setPitch(p.getLocation().getPitch());
+        ploc.setYaw(p.getLocation().getYaw());
+        
+        // Handle on set to lower y location
         boolean is2 = false;
         if (PlayerUtil.isAir(bDown.getType())) {
             final Block bDown2 = bDown.getRelative(BlockFace.DOWN);
@@ -71,18 +92,13 @@ public class NCPDragDownHook implements NCPHook
                 ploc.setY((double)bDown2.getLocation().getBlockY());
             } else ploc.setY((double)bDown.getLocation().getBlockY());
         }
-        ploc.setZ(p.getLocation().getZ());
-        ploc.setPitch(p.getLocation().getPitch());
-        ploc.setYaw(p.getLocation().getYaw());
         if (MaxY != -1.0 && FallDist != -1.0) {
             final MovingData mData = pData.getGenericInstance(MovingData.class);
             mData.noFallMaxY = MaxY;
             mData.setTeleported(ploc);
             mData.noFallFallDistance = FallDist + (is2 ? 2.0f : 1.0f);
         }
-        if (debug) {
-            log("Set position to " + (is2 ? "2": "1") + " block(s) lower!", p);
-        }
+        if (debug) log("Set position to " + (is2 ? "2": "1") + " block(s) lower!", p);        
         return false;
     }
     
