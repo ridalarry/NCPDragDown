@@ -12,6 +12,6 @@ public class PlayerUtil
         return !isAir(blockmat);
     }
     public static boolean isAir(final Material blocktype) {
-        return !BlockProperties.isLiquid(blocktype) && !BlockProperties.isNewLiq(blocktype) && (BlockProperties.isPassable(blocktype) || BlockProperties.isAir(blocktype));
+        return !BlockProperties.isLiquid(blocktype) && !BlockProperties.isWaterPlant(blocktype) && (BlockProperties.isPassable(blocktype) || BlockProperties.isAir(blocktype));
     }
 }
